@@ -5,7 +5,7 @@ class Sudoku:
     
     def __str__(self):
         string = ""
-        for row in grid:
+        for row in self.grid:
             string = str(row) if string == "" else string + "\n" + str(row)
         return string
     
@@ -52,10 +52,11 @@ class Sudoku:
         print("\nSolution " + str(self.__sol_cnt))
         print(self)
         return
-
+'''
 if __name__ == '__main__':
     with open("\\Users\\hamza\\Documents\\VS Code\\Python\\Sudoku Solver\\input_sudoku.txt", "r") as text_file:
         grid = [row.split() for row in text_file]
     grid = [list(map(int, row)) for row in grid]
     puzzle = Sudoku(grid)
     puzzle.solve()
+'''
