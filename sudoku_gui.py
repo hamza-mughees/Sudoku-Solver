@@ -1,34 +1,35 @@
 from sudoku_solver import Sudoku
+from button import Button
 import pygame
 
 pygame.init()
 
-screen_width = 450
-screen_height = 500
+win_width = 450
+win_height = 500
 
-screen = pygame.display.set_mode((screen_width, screen_height))
+win = pygame.display.set_mode((win_width, win_height))
 pygame.display.set_caption("Sudoku Solver")
 
-cell_width = screen_width//9
+cell_width = win_width//9
 bg = (255, 255, 255)
 fg = (0, 0, 0)
-base_font = pygame.font.Font(None, 32)
+font = pygame.font.Font(None, 32)
 
 grid = [
-    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
-    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
-    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
-    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
-    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
-    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
-    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
-    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
-    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
+    ['9', '0', '6', '0', '7', '0', '4', '0', '3'],
+    ['0', '0', '0', '4', '0', '0', '2', '0', '0'],
+    ['0', '7', '0', '0', '2', '3', '0', '1', '0'],
+    ['5', '0', '0', '0', '0', '0', '1', '0', '0'],
+    ['0', '4', '0', '2', '0', '8', '0', '6', '0'],
+    ['0', '0', '3', '0', '0', '0', '0', '0', '5'],
+    ['0', '3', '0', '7', '0', '0', '0', '5', '0'],
+    ['0', '0', '7', '0', '0', '5', '0', '0', '0'],
+    ['4', '0', '5', '0', '1', '0', '7', '0', '8'],
 ]
 
 def horiz_line(y, t):
     pygame.draw.line(
-        screen, 
+        win, 
         fg, 
         (0, y), 
         (9*cell_width, y), 
@@ -37,7 +38,7 @@ def horiz_line(y, t):
 
 def vert_line(x, t):
     pygame.draw.line(
-        screen, 
+        win, 
         fg, 
         (x, 0), 
         (x, 9*cell_width), 
@@ -56,16 +57,16 @@ def update_cell(i, j):
             cell_width + se_offset,
         )
         pygame.draw.rect(
-            screen, 
+            win, 
             bg, 
             cell,
         )
-        num_disp = base_font.render(
+        num_disp = font.render(
             num_in_cell, 
             True, 
             fg,
         )
-        screen.blit(
+        win.blit(
             num_disp, 
             (cell.x + 15, cell.y + 10),
         )
@@ -77,9 +78,16 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        
         if event.type == pygame.MOUSEBUTTONDOWN:
-            a_cell_active = True
             mouse_pressed_pos = event.pos
+            if mouse_pressed_pos[1] <= 450:
+                a_cell_active = True
+            if solve_button.mouse_is_over(mouse_pressed_pos):
+                grid = [list(map(int, row)) for row in grid]
+                puzzle = Sudoku(grid)
+                puzzle.solve()
+            
         if event.type == pygame.KEYDOWN:
             if a_cell_active:
                 if event.unicode >= '0' and event.unicode <= '9': 
@@ -88,7 +96,7 @@ while True:
                 if event.key == pygame.K_RETURN:
                     a_cell_active = False
     
-    screen.fill(bg)
+    win.fill(bg)
 
     for i in range(10):
         if i % 3 == 0: t = 4
@@ -100,9 +108,12 @@ while True:
         for j in range(9):
             update_cell(i, j)
     
-    if a_cell_active and mouse_pressed_pos[1] < 450:    # to update and display active cell
+    if a_cell_active:    # to update and display active cell
         i = mouse_pressed_pos[1] // cell_width
         j = mouse_pressed_pos[0] // cell_width
         update_cell(i, j)
+    
+    solve_button = Button(15, 465, 60, 24, bg, "Solve")
+    solve_button.draw(win, True)
     
     pygame.display.update()
