@@ -1,36 +1,108 @@
+from sudoku_solver import Sudoku
 import pygame
+
 pygame.init()
 
-wnd_size = 450
-wnd = pygame.display.set_mode((wnd_size, wnd_size))
+screen_width = 450
+screen_height = 500
+
+screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Sudoku Solver")
 
-cell_size = wnd_size//9
-box_size = cell_size*3
-bg = (0, 0, 0)
-fg = (255, 255, 255)
+cell_width = screen_width//9
+bg = (255, 255, 255)
+fg = (0, 0, 0)
+base_font = pygame.font.Font(None, 32)
+
+grid = [
+    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
+    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
+    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
+    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
+    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
+    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
+    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
+    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
+    ['0', '0', '0', '0', '0', '0', '0', '0', '0'],
+]
 
 def horiz_line(y, t):
-    pygame.draw.line(wnd, fg, (0, y), (wnd_size, y), t)
+    pygame.draw.line(
+        screen, 
+        fg, 
+        (0, y), 
+        (9*cell_width, y), 
+        t,
+    )
 
 def vert_line(x, t):
-    pygame.draw.line(wnd, fg, (x, 0), (x, wnd_size), t)
+    pygame.draw.line(
+        screen, 
+        fg, 
+        (x, 0), 
+        (x, 9*cell_width), 
+        t,
+    )
 
-run = True
+def update_cell(i, j):
+    nw_offset = 4
+    se_offset = -6
+    num_in_cell = grid[i][j]
+    if num_in_cell != '0':
+        cell = pygame.Rect(
+            j*cell_width + nw_offset, 
+            i*cell_width + nw_offset, 
+            cell_width + se_offset, 
+            cell_width + se_offset,
+        )
+        pygame.draw.rect(
+            screen, 
+            bg, 
+            cell,
+        )
+        num_disp = base_font.render(
+            num_in_cell, 
+            True, 
+            fg,
+        )
+        screen.blit(
+            num_disp, 
+            (cell.x + 15, cell.y + 10),
+        )
 
-while run:
+a_cell_active = False
+
+while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            run = False
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            a_cell_active = True
+            mouse_pressed_pos = event.pos
+        if event.type == pygame.KEYDOWN:
+            if a_cell_active:
+                if event.unicode >= '0' and event.unicode <= '9': 
+                    grid[i][j] = grid[i][j][:-1]
+                    grid[i][j] += event.unicode
+                if event.key == pygame.K_RETURN:
+                    a_cell_active = False
     
-    wnd.fill(bg)
+    screen.fill(bg)
 
-    for i in range(1, 9):
-        if i == 3 or i == 6: t = 4
+    for i in range(10):
+        if i % 3 == 0: t = 4
         else: t = 1
-        horiz_line(i*cell_size, t)
-        vert_line(i*cell_size, t)
+        horiz_line(i*cell_width, t)
+        vert_line(i*cell_width, t)
+    
+    for i in range(9):          # to display all cells
+        for j in range(9):
+            update_cell(i, j)
+    
+    if a_cell_active and mouse_pressed_pos[1] < 450:    # to update and display active cell
+        i = mouse_pressed_pos[1] // cell_width
+        j = mouse_pressed_pos[0] // cell_width
+        update_cell(i, j)
     
     pygame.display.update()
-
-pygame.quit()
