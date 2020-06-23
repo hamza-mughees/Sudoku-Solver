@@ -62,7 +62,7 @@ def update_cell(i, j):
             cell,
         )
         num_disp = font.render(
-            num_in_cell, 
+            str(num_in_cell), 
             True, 
             fg,
         )
@@ -77,7 +77,6 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-            sys.exit()
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pressed_pos = event.pos
@@ -87,6 +86,9 @@ while True:
                 grid = [list(map(int, row)) for row in grid]
                 puzzle = Sudoku(grid)
                 puzzle.solve()
+                solutions = puzzle.get_solutions()
+                grid = solutions[0] if len(solutions) > 0 else grid
+                grid = [list(map(str, row)) for row in grid]
             
         if event.type == pygame.KEYDOWN:
             if a_cell_active:
@@ -108,7 +110,7 @@ while True:
         for j in range(9):
             update_cell(i, j)
     
-    if a_cell_active:    # to update and display active cell
+    if a_cell_active and mouse_pressed_pos[1] <= 450:    # to update and display active cell
         i = mouse_pressed_pos[1] // cell_width
         j = mouse_pressed_pos[0] // cell_width
         update_cell(i, j)

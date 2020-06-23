@@ -1,13 +1,21 @@
+import ast
+
 class Sudoku:
     def __init__(self, grid):
         self.grid = grid
         self.__sol_cnt = 0
+        self.__solutions_list = []
     
-    def __str__(self):
-        string = ""
+    def __a_solution(self):       # I know this method seems unnecessary from the looks of it, but trust me, it has its reasons lol
+        grid_string = ""
         for row in self.grid:
-            string = str(row) if string == "" else string + "\n" + str(row)
-        return string
+            grid_string = str(row) if grid_string == "" else grid_string + "\n" + str(row)
+        l = []
+        grid_string = grid_string.split("\n")
+        for row_string in grid_string:
+            eval_row = ast.literal_eval(row_string)
+            l.append(eval_row)
+        return l
     
     def __is_empty(self, x, y):
         if self.grid[y][x] == 0: return True
@@ -37,6 +45,9 @@ class Sudoku:
                     return False
         
         return True
+    
+    def __append_list(self):
+        self.__solutions_list.append(self.__a_solution())
 
     def solve(self):        # using back-tracking algorithm
         for y in range(9):
@@ -48,10 +59,11 @@ class Sudoku:
                             self.solve()
                             self.__empty(x, y)
                     return
-        self.__sol_cnt += 1
-        print("\nSolution " + str(self.__sol_cnt))
-        print(self)
+        self.__append_list()
         return
+    
+    def get_solutions(self):
+        return self.__solutions_list
 '''
 if __name__ == '__main__':
     with open("\\Users\\hamza\\Documents\\VS Code\\Python\\Sudoku Solver\\input_sudoku.txt", "r") as text_file:
@@ -59,4 +71,5 @@ if __name__ == '__main__':
     grid = [list(map(int, row)) for row in grid]
     puzzle = Sudoku(grid)
     puzzle.solve()
+    print(puzzle.get_solutions())
 '''
